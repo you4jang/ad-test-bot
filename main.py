@@ -90,6 +90,7 @@ def send_msg(chat_id, text, reply_to=None, no_preview=True, keyboard=None):
     no_preview: (boolean) URL 자동 링크(미리보기) 끄기
     keyboard:   (list)    커스텀 키보드 지정
     """
+    print 'chat_id : {}'.format(str(chat_id))
     params = {
         'chat_id': str(chat_id),
         'text': text.encode('utf-8'),
