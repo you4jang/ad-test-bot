@@ -20,7 +20,7 @@ import re
 
 # 봇 토큰, 봇 API 주소
 TOKEN = '318919736:AAGiRcwP_HkaDGlvNsZxAF4gOOQQJMUYpXA'
-BASE_URL = 'https://api.telegram.org/bot' + TOKEN + '/'
+BASE_URL = 'https://api.telegram.org/bot{token}/'.format(token=TOKEN)
 
 # 봇이 응답할 명령어
 CMD_START = '/start'
@@ -170,12 +170,12 @@ def process_cmds(msg):
     msg_id = msg['message_id']
     chat_id = msg['chat']['id']
     text = msg.get('text')
-    if (not text):
+    if not text:
         return
     if CMD_START == text:
         cmd_start(chat_id)
         return
-    if (not get_enabled(chat_id)):
+    if not get_enabled(chat_id):
         return
     if CMD_STOP == text:
         cmd_stop(chat_id)
@@ -212,7 +212,9 @@ class SetWebhookHandler(webapp2.RequestHandler):
         urlfetch.set_default_fetch_deadline(60)
         url = self.request.get('url')
         if url:
-            self.response.write(json.dumps(json.load(urllib2.urlopen(BASE_URL + 'setWebhook', urllib.urlencode({'url': url})))))
+            parameter = urllib.urlencode({'url': url})
+            result = urllib2.urlopen('{url}setWebhook'.format(url=BASE_URL), parameter)
+            self.response.write(json.dumps(json.load(result)))
 
 
 # /webhook 요청시 (텔레그램 봇 API)
@@ -225,9 +227,12 @@ class WebhookHandler(webapp2.RequestHandler):
 
 
 # 구글 앱 엔진에 웹 요청 핸들러 지정
-app = webapp2.WSGIApplication([
-    ('/me', MeHandler),
-    ('/updates', GetUpdatesHandler),
-    ('/set-webhook', SetWebhookHandler),
-    ('/webhook', WebhookHandler),
-], debug=True)
+app = webapp2.WSGIApplication(
+    [
+        ('/me', MeHandler),
+        ('/updates', GetUpdatesHandler),
+        ('/set-webhook', SetWebhookHandler),
+        ('/webhook', WebhookHandler),
+    ],
+    debug=True
+)
