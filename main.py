@@ -226,6 +226,19 @@ class WebhookHandler(webapp2.RequestHandler):
         process_cmds(body['message'])
 
 
+# /line 요청시 (테스트용)
+class LineWebhookHandler(webapp2.RequestHandler):
+    def post(self):
+        # 아마도 실패로 간주할 시간을 지정하는 것 같다.
+        urlfetch.set_default_fetch_deadline(60)
+        # 리퀘스트의 페이로드를 알아온다.
+        body = json.loads(self.request.body)
+        # 리스폰스에 넣는다.
+        # 이대로 출력시키면 무슨 내용이 오고가는지 알 수 있을 것이다.
+        self.response.write(json.dumps(body))
+        # 이 부분이 리퀘스트의 내용을 가지고 봇에게 내용을 처리시키는 부분이다.
+        # process_cmds(body['message'])
+
 # 구글 앱 엔진에 웹 요청 핸들러 지정
 app = webapp2.WSGIApplication(
     [
@@ -233,6 +246,7 @@ app = webapp2.WSGIApplication(
         ('/updates', GetUpdatesHandler),
         ('/set-webhook', SetWebhookHandler),
         ('/webhook', WebhookHandler),
+        ('/line', LineWebhookHandler),
     ],
     debug=True
 )
