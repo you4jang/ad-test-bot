@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# coding=utf-8
 #
 # original:    https://github.com/yukuku/telebot
 # modified by: Bak Yeon O @ http://bakyeono.net
