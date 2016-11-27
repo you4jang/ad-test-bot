@@ -227,6 +227,7 @@ class WebhookHandler(webapp2.RequestHandler):
 
 
 # /line 요청시 (테스트용)
+# 테스트
 class LineWebhookHandler(webapp2.RequestHandler):
     def post(self):
         # 아마도 실패로 간주할 시간을 지정하는 것 같다.
