@@ -35,7 +35,7 @@ USAGE = u"""[사용법] 아래 명령어를 메시지로 보내거나 버튼을 
 /help  - (이 도움말 보여주기)
 """
 MSG_START = u'봇을 시작합니다.'
-MSG_STOP  = u'봇을 정지합니다.'
+MSG_STOP = u'봇을 정지합니다.'
 
 # 커스텀 키보드
 CUSTOM_KEYBOARD = [
@@ -44,12 +44,14 @@ CUSTOM_KEYBOARD = [
         [CMD_HELP],
         ]
 
+
 # 채팅별 봇 활성화 상태
 # 구글 앱 엔진의 Datastore(NDB)에 상태를 저장하고 읽음
 # 사용자가 /start 누르면 활성화
 # 사용자가 /stop  누르면 비활성화
 class EnableStatus(ndb.Model):
     enabled = ndb.BooleanProperty(required=True, indexed=True, default=False,)
+
 
 def set_enabled(chat_id, enabled):
     u"""set_enabled: 봇 활성화/비활성화 상태 변경
@@ -60,6 +62,7 @@ def set_enabled(chat_id, enabled):
     es.enabled = enabled
     es.put()
 
+
 def get_enabled(chat_id):
     u"""get_enabled: 봇 활성화/비활성화 상태 반환
     return: (boolean)
@@ -69,12 +72,14 @@ def get_enabled(chat_id):
         return es.enabled
     return False
 
+
 def get_enabled_chats():
     u"""get_enabled: 봇이 활성화된 채팅 리스트 반환
     return: (list of EnableStatus)
     """
     query = EnableStatus.query(EnableStatus.enabled == True)
     return query.fetch()
+
 
 # 메시지 발송 관련 함수들
 def send_msg(chat_id, text, reply_to=None, no_preview=True, keyboard=None):
@@ -106,12 +111,14 @@ def send_msg(chat_id, text, reply_to=None, no_preview=True, keyboard=None):
     except Exception as e:
         logging.exception(e)
 
+
 def broadcast(text):
     u"""broadcast: 봇이 켜져 있는 모든 채팅에 메시지 발송
     text:       (string)  메시지 내용
     """
     for chat in get_enabled_chats():
         send_msg(chat.key.string_id(), text)
+
 
 # 봇 명령 처리 함수들
 def cmd_start(chat_id):
@@ -121,6 +128,7 @@ def cmd_start(chat_id):
     set_enabled(chat_id, True)
     send_msg(chat_id, MSG_START, keyboard=CUSTOM_KEYBOARD)
 
+
 def cmd_stop(chat_id):
     u"""cmd_stop: 봇을 비활성화하고, 비활성화 메시지 발송
     chat_id: (integer) 채팅 ID
@@ -128,11 +136,13 @@ def cmd_stop(chat_id):
     set_enabled(chat_id, False)
     send_msg(chat_id, MSG_STOP)
 
+
 def cmd_help(chat_id):
     u"""cmd_help: 봇 사용법 메시지 발송
     chat_id: (integer) 채팅 ID
     """
     send_msg(chat_id, USAGE, keyboard=CUSTOM_KEYBOARD)
+
 
 def cmd_broadcast(chat_id, text):
     u"""cmd_broadcast: 봇이 활성화된 모든 채팅에 메시지 방송
@@ -142,6 +152,7 @@ def cmd_broadcast(chat_id, text):
     send_msg(chat_id, u'메시지를 방송합니다.', keyboard=CUSTOM_KEYBOARD)
     broadcast(text)
 
+
 def cmd_echo(chat_id, text, reply_to):
     u"""cmd_echo: 사용자의 메시지를 따라서 답장
     chat_id:  (integer) 채팅 ID
@@ -149,6 +160,7 @@ def cmd_echo(chat_id, text, reply_to):
     reply_to: (integer) 답장할 메시지 ID
     """
     send_msg(chat_id, text, reply_to=reply_to)
+
 
 def process_cmds(msg):
     u"""사용자 메시지를 분석해 봇 명령을 처리
@@ -178,6 +190,7 @@ def process_cmds(msg):
     cmd_echo(chat_id, text, reply_to=msg_id)
     return
 
+
 # 웹 요청에 대한 핸들러 정의
 # /me 요청시
 class MeHandler(webapp2.RequestHandler):
@@ -185,11 +198,13 @@ class MeHandler(webapp2.RequestHandler):
         urlfetch.set_default_fetch_deadline(60)
         self.response.write(json.dumps(json.load(urllib2.urlopen(BASE_URL + 'getMe'))))
 
+
 # /updates 요청시
 class GetUpdatesHandler(webapp2.RequestHandler):
     def get(self):
         urlfetch.set_default_fetch_deadline(60)
         self.response.write(json.dumps(json.load(urllib2.urlopen(BASE_URL + 'getUpdates'))))
+
 
 # /set-wehook 요청시
 class SetWebhookHandler(webapp2.RequestHandler):
@@ -199,6 +214,7 @@ class SetWebhookHandler(webapp2.RequestHandler):
         if url:
             self.response.write(json.dumps(json.load(urllib2.urlopen(BASE_URL + 'setWebhook', urllib.urlencode({'url': url})))))
 
+
 # /webhook 요청시 (텔레그램 봇 API)
 class WebhookHandler(webapp2.RequestHandler):
     def post(self):
@@ -206,6 +222,7 @@ class WebhookHandler(webapp2.RequestHandler):
         body = json.loads(self.request.body)
         self.response.write(json.dumps(body))
         process_cmds(body['message'])
+
 
 # 구글 앱 엔진에 웹 요청 핸들러 지정
 app = webapp2.WSGIApplication([
