@@ -23,9 +23,9 @@ TOKEN = '318919736:AAGiRcwP_HkaDGlvNsZxAF4gOOQQJMUYpXA'
 BASE_URL = 'https://api.telegram.org/bot' + TOKEN + '/'
 
 # 봇이 응답할 명령어
-CMD_START     = '/start'
-CMD_STOP      = '/stop'
-CMD_HELP      = '/help'
+CMD_START = '/start'
+CMD_STOP = '/stop'
+CMD_HELP = '/help'
 CMD_BROADCAST = '/broadcast'
 
 # 봇 사용법 & 메시지
